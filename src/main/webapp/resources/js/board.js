@@ -9,7 +9,9 @@ function clkArticle(i_board) {
 //삭제 버튼 클릭
 function clkDel(i_board, typ) {
 	if(confirm('삭제 하시겠습니까?')) {
-		fetch(`/board/del/${i_board}`)
+		fetch(`/board/del/${i_board}`,{
+			method: 'delete'
+		})
 		.then(function(res) {			
 			return res.json();
 		}).then(function(myJson) {
@@ -66,10 +68,99 @@ function toggleFavorite(i_board) {
 		console.err('err 발생 : ' + err);
 	});
 }
+var cmtObj = {
+	createCmtTable: function() {
+		var tableElem = document.createElement('table')
+		tableElem.innerHTML = 
+		`<tr>
+			<th>내용</th>
+			<th>작성자</th>
+			<th>작성일</th>
+			<th>비고</th>
+		</tr>`			
+		return tableElem
+	},
 
+	getCmtList: function(i_board) {
+		fetch(`/board/cmtList?i_board=${i_board}`)
+			.then(function(res) {
+				return res.json()
+			})
+			.then((list) => {
+				this.proc(list)
+			})
+	},
 
+	createRecode: function(item) {
 
+	},
+	proc: function(list) {
+		var table = this.createCmtTable()
 
+		console.log(list)
+	}	
+}
+
+var cmtListElem = document.querySelector('#cmtList')
+if(cmtListElem) {
+	var i_board = document.querySelector('#i_board').dataset.id
+	cmtObj.getCmtList(i_board)
+}
+
+//댓글달기
+var cmtFrmElem = document.querySelector('#cmtFrm')
+if(cmtFrmElem) {	
+	cmtFrmElem.onsubmit = function(e) {
+		e.preventDefault()
+	}
+
+	var ctntElem = cmtFrmElem.ctnt
+	var i_board = document.querySelector('#i_board').dataset.id
+	var btnElem = cmtFrmElem.btn
+	
+	ctntElem.onkeyup = function(e) {
+		console.log(e.keyCode)
+		if(e.keyCode === 13) {
+			ajax()
+		}
+	}
+	btnElem.addEventListener('click', ajax)
+	
+	function ajax () {		
+		if(ctntElem.value === '') {
+			return
+		}
+	
+		var param = {
+			i_board: i_board,
+			ctnt: ctntElem.value
+		}
+
+		console.log(param)
+		fetch('/board/insCmt', {
+			method: 'POST',
+			headers: {
+            	'Content-Type': 'application/json'
+			},
+			body: JSON.stringify(param)
+		}).then(function(res) {
+			return res.json()
+		}).then(function(data) {
+			proc(data)
+		})
+	}
+
+	function proc (data) {
+		switch(data.result){
+			case 0:
+				alert('댓글 작성 실패하였습니다')
+			return
+			case 1:
+				ctntElem.value = ''
+			return
+		}
+	}
+}
 
 
 

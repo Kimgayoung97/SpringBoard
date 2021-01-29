@@ -7,4 +7,7 @@ import com.koreait.sboard.model.ManageBoardEntity;
 public class Const {
 	public static List<ManageBoardEntity> menuList = null;	
 	public static final String LOGINUSER = "loginUser";
+	public static final String KEY_DATA = "data";
+	public static final String KEY_LIST = "list";
+	public static final String KEY_RESULT = "result";
 }
